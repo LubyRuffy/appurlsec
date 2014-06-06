@@ -2,6 +2,7 @@
 require 'pathname'
 require 'optparse'
 require 'logger'
+require 'netaddr'
 
 $:.unshift(File.expand_path(File.dirname(__FILE__)))
 .unshift(File.expand_path(File.join(File.dirname(__FILE__), 'lib')))
@@ -79,12 +80,12 @@ def grephttp(destdir)
   grep_cmd = "grep -irhEo \"http[s]?://[^'\\\"]*\" #{destdir}"
   @logger.info grep_cmd
   info = `#{grep_cmd}`
-  info.split(/[\r\n]/)
+  remove_bigbrother info.split(/[\r\n]/).compact.uniq.sort
 end
 
 def remove_bigbrother(hosts)
   hosts = hosts.select {|h|
-    h && !h.include?('.renren.com') && !h.include?('.weibo.cn') && !h.include?('.weibo.com') && !h.include?('.gtimg.cn') && !h.include?('.qplus.com') && !h.include?('.qcloud.com') && !h.include?('.adview.cn') && !h.include?('.adwo.com') && !h.include?('.facebook.com') && !h.include?('.flurry.com') && !h.include?('.appspot.com') && !h.include?('.twitter.com') && !h.include?('.apache.org') && !h.include?('.amap') && !h.include?('.android.com') && !h.include?('.qq.com') && !h.include?('.google-analytics.com') && !h.include?('.baidu.com') 
+    h && !h.include?('.mmarket.com') && !h.include?('.douban.com') && !h.include?('.189store.com') && !h.include?('xmlpull.org') && !h.include?('.xmlsoap.org') && !h.include?('.google.com') && !h.include?('.w3.org') && !h.include?('.renren.com') && !h.include?('.weibo.cn') && !h.include?('.weibo.com') && !h.include?('.gtimg.cn') && !h.include?('.qplus.com') && !h.include?('.qcloud.com') && !h.include?('.adview.cn') && !h.include?('.adwo.com') && !h.include?('.facebook.com') && !h.include?('.flurry.com') && !h.include?('.appspot.com') && !h.include?('.twitter.com') && !h.include?('.apache.org') && !h.include?('.amap') && !h.include?('.android.com') && !h.include?('.qq.com') && !h.include?('.google-analytics.com') && !h.include?('.baidu.com') 
   }
   hosts
 end
@@ -94,12 +95,13 @@ def main()
   destdir = @options[:dir]
   destdir ||= apk2java(@options[:apk])   
   urls = grephttp(destdir)
-  #puts urls
+  puts urls
   hosts = hosts_of_urls(urls)
   hosts = remove_bigbrother(hosts)
   puts hosts
-  domains = domains_of_hosts(hosts)
   ips = ips_of_hosts(hosts)
+  domains = domains_of_hosts(hosts)
+  puts ips
 end
 
 main()
