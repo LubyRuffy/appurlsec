@@ -12,7 +12,7 @@ include LubyRuffyUrl
 
 class OptsConsole
   def self.parse(args)
-    options = { :dir=>nil, :apk=>nil, :log_level=>0 }
+    options = { :dir=>nil, :apk=>nil, :log_level=>1 }
 
     opts_ = OptionParser.new do |opts|
       opts.banner = "APP url security scanner By LubyRuffy"
@@ -71,7 +71,7 @@ def apk2java(apkpath, destdir=nil)
   jadx_cmd += apkpath
   @logger.info jadx_cmd
   info = `#{jadx_cmd}`
-  destdir ||= File.basename(apkpath).split('.')[0]
+  destdir ||= File.basename(apkpath, ".*")
   destdir
 end
 
@@ -94,6 +94,7 @@ end
 def main()
   destdir = @options[:dir]
   destdir ||= apk2java(@options[:apk])   
+  @logger.info "destdir is : #{destdir}"
   urls = grephttp(destdir)
   puts urls
   hosts = hosts_of_urls(urls)
